@@ -23,7 +23,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
   
 */
 public class Robot extends TimedRobot {
-
+  private static final double kAngleSetpoint = 0.0;
   private static final double kP = 0.005; // propotional turning constant
 
   // gyro calibration constant, may need to be adjusted
@@ -68,18 +68,18 @@ public class Robot extends TimedRobot {
   JoystickButton button11 = new JoystickButton(stick, 11);
 
 
-  Encoder enc_left = new Encoder(0, 1);
-  Encoder enc_right = new Encoder(2, 3);
+  //Encoder enc_left = new Encoder(0, 1);
+  //Encoder enc_right = new Encoder(2, 3);
   ADIS16470_IMU gyro = new ADIS16470_IMU();
 
   DoubleSolenoid double_shooter =
-      new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 2, 3);
+      new DoubleSolenoid(2, 3);
 
   DoubleSolenoid double_elevator =
-      new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 7);
+      new DoubleSolenoid(6, 7);
 
   DoubleSolenoid double_intake =
-      new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 4, 5);
+      new DoubleSolenoid(4, 5);
 
 
   @Override
@@ -89,10 +89,14 @@ public class Robot extends TimedRobot {
     leftFollower.follow(leftLeader);
     leftLeader.setInverted(true);
 
-    enc_left.setDistancePerPulse(1./800);
-    enc_right.setDistancePerPulse(1./800);
+    //enc_left.setDistancePerPulse(1./800);
+    //enc_right.setDistancePerPulse(1./800);
+    gyro.calibrate();
+    gyro.reset();
 
-    System.out.println(gyro.getAngle());
+    /* Solenoids 
+    double_elevator.set(true);
+    */
   }
 
   // solneoidler butonlara atanır
@@ -109,23 +113,32 @@ public class Robot extends TimedRobot {
       intakeMotor.set(0);
     }
 
-    // Solenoids
+    /* Solenoids
     if (stick.getRawButton(kDoubleSolenoidForward)) {
       double_elevator.set(DoubleSolenoid.Value.kForward);
     } else if (stick.getRawButton(kDoubleSolenoidReverse)) {
-      doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+      double_elevator.set(DoubleSolenoid.Value.kReverse);
     }
+    */
 
-    double turningValue = (0 - gyro.getAngle()) * kP;
+    //double turningValue = (0 - gyro.getAngle()) * kP;
+    
     // Invert the direction of the turn if we are going backwards
-    turningValue = Math.copySign(turningValue, stick.getY());
- 
+    //turningValue = Math.copySign(turningValue, stick.getY());
+    double x_value = gyro.getGyroInstantX();
+    double y_value = gyro.getGyroInstantY();
+    double z_value = gyro.getGyroInstantZ();
+    double angle = gyro.getAngle();
+    System.out.println(x_value);
+    System.out.println(y_value);
+    System.out.println(z_value);
+    System.out.println(angle);
+
+
     double hiz = stick.getThrottle();
 
-    robot.arcadeDrive(hiz* stick.getY(), turningValue);
-   
-
-
+    robot.arcadeDrive(hiz* stick.getY(), hiz * stick.getX());
+  
 
     }
 
