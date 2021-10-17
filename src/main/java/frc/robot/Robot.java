@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Encoder;
@@ -11,7 +12,7 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 
-import com.analog.adis16470.frc.ADIS16470_IMU;
+import frc.robot.Gyroscope;
 import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
@@ -62,15 +63,15 @@ public class Robot extends TimedRobot {
   DifferentialDrive robot = new DifferentialDrive(leftLeader, rightLeader);
   JoystickButton button1 = new JoystickButton(stick, 1);
   JoystickButton button2 = new JoystickButton(stick, 2);
-  JoystickButton button3 = new JoystickButton(stick, 3);
-  JoystickButton button4 = new JoystickButton(stick, 4);
-  JoystickButton button6 = new JoystickButton(stick, 6);
+  JoystickButton kElevatorS = new JoystickButton(stick, 3);
+  JoystickButton kIntakeS = new JoystickButton(stick, 4);
+  JoystickButton kShooterS = new JoystickButton(stick, 6);
   JoystickButton button11 = new JoystickButton(stick, 11);
 
 
   //Encoder enc_left = new Encoder(0, 1);
   //Encoder enc_right = new Encoder(2, 3);
-  ADIS16470_IMU gyro = new ADIS16470_IMU();
+  Gyroscope gyro = new Gyroscope();
 
   DoubleSolenoid double_shooter =
       new DoubleSolenoid(2, 3);
@@ -92,7 +93,6 @@ public class Robot extends TimedRobot {
     //enc_left.setDistancePerPulse(1./800);
     //enc_right.setDistancePerPulse(1./800);
     gyro.calibrate();
-    gyro.reset();
 
     /* Solenoids 
     double_elevator.set(true);
@@ -113,31 +113,38 @@ public class Robot extends TimedRobot {
       intakeMotor.set(0);
     }
 
-    /* Solenoids
-    if (stick.getRawButton(kDoubleSolenoidForward)) {
+   
+    if (stick.getRawButton(3)) {
       double_elevator.set(DoubleSolenoid.Value.kForward);
-    } else if (stick.getRawButton(kDoubleSolenoidReverse)) {
+    } else {
       double_elevator.set(DoubleSolenoid.Value.kReverse);
     }
-    */
-
-    //double turningValue = (0 - gyro.getAngle()) * kP;
     
+    if (stick.getRawButton(4)) {
+      double_intake.set(DoubleSolenoid.Value.kForward);
+    } else {
+      double_intake.set(DoubleSolenoid.Value.kReverse);
+    }
+
+    if (stick.getRawButton(6)) {
+      double_shooter.set(DoubleSolenoid.Value.kForward);
+    } else {
+      double_shooter.set(DoubleSolenoid.Value.kReverse);
+    }
+
     // Invert the direction of the turn if we are going backwards
     //turningValue = Math.copySign(turningValue, stick.getY());
-    double x_value = gyro.getGyroInstantX();
-    double y_value = gyro.getGyroInstantY();
-    double z_value = gyro.getGyroInstantZ();
-    double angle = gyro.getAngle();
-    System.out.println(x_value);
-    System.out.println(y_value);
-    System.out.println(z_value);
-    System.out.println(angle);
-
-
     double hiz = stick.getThrottle();
+    double angular_error = (gyro.getGyroAngle() - desiredAngle) * P_VALUE;
+    if (angular_error < -10 && angular_error > 10) {
+      robot.arcadeDrive(hiz * stick.getY(), -hiz * angle);
+    } else {
+      robot.arcadeDrive(hiz * stick.getY(), -hiz * stick.getX());
+    }
 
-    robot.arcadeDrive(hiz* stick.getY(), hiz * stick.getX());
+    SmartDashboard.putNumber("stick_x", stick.getX());
+    SmartDashboard.putNumber("stick_val", -hiz * angle);
+
   
 
     }
