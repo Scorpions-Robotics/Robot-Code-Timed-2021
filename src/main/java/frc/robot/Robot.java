@@ -66,12 +66,12 @@ public class Robot extends TimedRobot {
   JoystickButton kElevatorS = new JoystickButton(stick, 3);
   JoystickButton kIntakeS = new JoystickButton(stick, 4);
   JoystickButton kShooterS = new JoystickButton(stick, 6);
-  JoystickButton button11 = new JoystickButton(stick, 11);
+  JoystickButton kPIDActivate = new JoystickButton(stick, 11);
 
 
   //Encoder enc_left = new Encoder(0, 1);
   //Encoder enc_right = new Encoder(2, 3);
-  Gyroscope gyro = new Gyroscope();
+  // Gyroscope gyro = new Gyroscope();
 
   DoubleSolenoid double_shooter =
       new DoubleSolenoid(2, 3);
@@ -92,7 +92,7 @@ public class Robot extends TimedRobot {
 
     //enc_left.setDistancePerPulse(1./800);
     //enc_right.setDistancePerPulse(1./800);
-    gyro.calibrate();
+    // gyro.calibrate();
 
     /* Solenoids 
     double_elevator.set(true);
@@ -135,15 +135,12 @@ public class Robot extends TimedRobot {
     // Invert the direction of the turn if we are going backwards
     //turningValue = Math.copySign(turningValue, stick.getY());
     double hiz = stick.getThrottle();
-    double angular_error = (gyro.getGyroAngle() - desiredAngle) * P_VALUE;
-    if (angular_error < -10 && angular_error > 10) {
-      robot.arcadeDrive(hiz * stick.getY(), -hiz * angle);
-    } else {
-      robot.arcadeDrive(hiz * stick.getY(), -hiz * stick.getX());
+    if (stick.getRawButton(11)){
+        // PID kontrolü yapılır
     }
-
-    SmartDashboard.putNumber("stick_x", stick.getX());
-    SmartDashboard.putNumber("stick_val", -hiz * angle);
+    else{
+      robot.arcadeDrive(hiz* stick.getY(), hiz* stick.getX());
+    }
 
   
 
