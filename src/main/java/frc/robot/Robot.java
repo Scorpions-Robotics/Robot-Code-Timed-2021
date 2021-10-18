@@ -72,7 +72,9 @@ public class Robot extends TimedRobot {
 
     //enc_left.setDistancePerPulse(1./800);
     //enc_right.setDistancePerPulse(1./800);
+
     //gyro.calibrate();
+
   }
 
   // solneoidler butonlara atanır
@@ -116,6 +118,7 @@ public class Robot extends TimedRobot {
       shooterLeft.set(0.5);
       shooterRight.set(0.5);
     }
+
 
     double hiz = stick.getThrottle();
 
