@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -151,12 +152,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
+    // Pulling data from network table
     xEntry = table.getEntry("X");
     yEntry = table.getEntry("Y");
     hEntry = table.getEntry("H");
     wEntry = table.getEntry("W");
 
+    // When y value is changed
+    yEntry.addListener(event -> {
+      System.out.println("Y changed value: " + value.getValue());
+   }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
     System.out.println(xEntry + " " + yEntry + " " + hEntry + " " + wEntry);
   }
-
 }
