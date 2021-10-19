@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 //import com.analog.adis16470.frc.ADIS16470_IMU;
 import com.ctre.phoenix.motorcontrol.Faults;
@@ -19,6 +22,14 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 public class Robot extends TimedRobot {
   Joystick stick = new Joystick(0);
   
+  NetworkTableEntry xEntry;
+  NetworkTableEntry yEntry;
+  NetworkTableEntry hEntry;
+  NetworkTableEntry wEntry;
+
+  NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  NetworkTable table = inst.getTable("datatable_name");
+
   int leftFollowerId = 5;
   int leftLeaderId = 1;
   int rightLeaderId = 2;
@@ -64,7 +75,9 @@ public class Robot extends TimedRobot {
 
 
   @Override
-    public void robotInit() {
+  public void robotInit() {
+
+
       
     rightFollower.follow(rightLeader);
     leftFollower.follow(leftLeader);
@@ -136,5 +149,15 @@ public class Robot extends TimedRobot {
     
 
     }
+
+  @Override
+  public void testPeriodic() {
+    xEntry = table.getEntry("X");
+    yEntry = table.getEntry("Y");
+    hEntry = table.getEntry("H");
+    wEntry = table.getEntry("W");
+
+    System.out.println(xEntry + " " + yEntry + " " + hEntry + " " + wEntry);
+  }
 
 }
