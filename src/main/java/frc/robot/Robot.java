@@ -1,23 +1,25 @@
 package frc.robot;
 
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMTalonSRX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.CvSource;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.cameraserver.CameraServer;
 
 //import com.analog.adis16470.frc.ADIS16470_IMU;
-import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 public class Robot extends TimedRobot {
@@ -27,10 +29,12 @@ public class Robot extends TimedRobot {
   NetworkTableEntry yEntry;
   NetworkTableEntry hEntry;
   NetworkTableEntry wEntry;
+  NetworkTableEntry dEntry;
 
   NetworkTableInstance inst = NetworkTableInstance.getDefault();
-  NetworkTable table = inst.getTable("datatable_name");
-
+ 
+  NetworkTable table = inst.getTable("Vision");
+  
   int leftFollowerId = 5;
   int leftLeaderId = 1;
   int rightLeaderId = 2;
@@ -64,7 +68,7 @@ public class Robot extends TimedRobot {
 
   //Encoder enc_left = new Encoder(0, 1);
   //Encoder enc_right = new Encoder(2, 3);
-  //ADIS16470_IMU gyro = new ADIS16470_IMU();
+  Gyroscope gyro = new Gyroscope();
 
   DoubleSolenoid double_shooter =
       new DoubleSolenoid(2, 3);
@@ -78,25 +82,36 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-
-
-      
+    inst.startClient("roborio-7672-frc.local"); 
+    gyro.resetGyro();
+    gyro.calibrate();
     rightFollower.follow(rightLeader);
     leftFollower.follow(leftLeader);
 
+    new Thread(() -> {
+      UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+      camera.setResolution(640, 480);
+      
 
-    //enc_left.setDistancePerPulse(1./800);
-    //enc_right.setDistancePerPulse(1./800);
+      CvSink cvSink = CameraServer.getInstance().getVideo();
+      CvSource outputStream = CameraServer.getInstance().putVideo("Video", 640, 480);
 
-    //gyro.calibrate();
+      Mat source = new Mat();
+      Mat output = new Mat();
+
+      while(!Thread.interrupted()) {
+          cvSink.grabFrame(source);
+          Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
+          outputStream.putFrame(output);
+      }
+  }).start();
 
   }
 
-  // solneoidler butonlara atanır
-  // gyro' nun ayarı yapılır
-  // 90 derecelik değişim için butonlara değer ver
+
   @Override
   public void teleopPeriodic() {
+    System.out.println(gyro.getGyroAngle());
 
     // Intake motor 
     if (stick.getRawButton(2)) {
@@ -131,17 +146,14 @@ public class Robot extends TimedRobot {
     if (stick.getRawButton(1)) {
       shooterLeft.set(-0.8);
       shooterRight.set(0.8);
+      liftMotor.set(0.5);
     }
     else{
       shooterLeft.set(0);
       shooterRight.set(0);
-    }
-
-    if(stick.getRawButton(1)) {
-      liftMotor.set(0.5);
-    } else {
       liftMotor.set(0);
     }
+
 
     double hiz = stick.getThrottle();
 
@@ -157,12 +169,25 @@ public class Robot extends TimedRobot {
     yEntry = table.getEntry("Y");
     hEntry = table.getEntry("H");
     wEntry = table.getEntry("W");
+    dEntry = table.getEntry("D");
+
 
     // When y value is changed
     yEntry.addListener(event -> {
-      System.out.println("Y changed value: " + value.getValue());
+      System.out.println("Y changed value: " + yEntry.getValue());
    }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-    System.out.println(xEntry + " " + yEntry + " " + hEntry + " " + wEntry);
+    System.out.println("deneme");
+    System.out.println(xEntry.getValue() + " " + yEntry + " " + hEntry + " " + wEntry);
+    
+    if(stick.getRawButton(11)){
+      if((int) dEntry < 0){
+        rightLeader.set(0.5);
+        leftLeader.set(-0.5);
+      }
+      else{
+        rightLeader.set(-0.5);
+        leftLeader.set(0.5);
+      }
+  }
   }
 }
