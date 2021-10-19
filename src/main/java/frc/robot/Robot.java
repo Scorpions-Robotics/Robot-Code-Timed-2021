@@ -178,9 +178,9 @@ public class Robot extends TimedRobot {
    }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
     System.out.println("deneme");
     System.out.println(xEntry.getValue() + " " + yEntry + " " + hEntry + " " + wEntry);
-    
+
     if(stick.getRawButton(11)){
-      if((int) dEntry < 0){
+      if((int) dEntry.getValue() < 0){
         rightLeader.set(0.5);
         leftLeader.set(-0.5);
       }
