@@ -1,7 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMTalonSRX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,6 +29,7 @@ public class Robot extends TimedRobot {
   int shooterRightId = 8;
   int intakeMotorId = 9;
   
+  PWMTalonSRX talon = new PWMTalonSRX(0);
 
   WPI_VictorSPX leftFollower = new   WPI_VictorSPX(leftFollowerId);
   WPI_VictorSPX leftLeader = new   WPI_VictorSPX(leftLeaderId);
@@ -68,7 +69,7 @@ public class Robot extends TimedRobot {
       
     rightFollower.follow(rightLeader);
     leftFollower.follow(leftLeader);
-    leftLeader.setInverted(true);
+
 
     //enc_left.setDistancePerPulse(1./800);
     //enc_right.setDistancePerPulse(1./800);
@@ -84,18 +85,20 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
 
     // Intake motor 
-    if (button2.get()) {
-      intakeMotor.set(0.4);
+    if (stick.getRawButton(2)) {
+      intakeMotor.set(-1);
+      talon.set(0.8);
     }
     else {
       intakeMotor.set(0);
+      talon.set(0);
     }
 
-   
-    if (stick.getRawButton(6)) { // top atmak için açılan yer
+    if (stick.getRawButton(6)) { // Shooter'ın kapaklarını açan pnömatik
+
       double_elevator.set(DoubleSolenoid.Value.kForward);
     } else {
-      double_elevator.set(DoubleSolenoid.Value.kReverse);
+      double_elevator.set(DoubleSolenoid.Value.kOff);
     }
     
     if (stick.getRawButton(4)) {
@@ -104,31 +107,33 @@ public class Robot extends TimedRobot {
       double_intake.set(DoubleSolenoid.Value.kReverse);
     }
 
-    if (stick.getRawButton(3)) { //intake
+    if (stick.getRawButton(5)) { //intake
+
       double_shooter.set(DoubleSolenoid.Value.kReverse);
+    } else if (stick.getRawButton(7)) { 
+      double_shooter.set(DoubleSolenoid.Value.kForward);
     }
 
-    if (stick.getRawButton(5)) {
+    if (stick.getRawButton(1)) {
+      shooterLeft.set(-0.8);
+      shooterRight.set(0.8);
+    }
+    else{
+      shooterLeft.set(0);
+      shooterRight.set(0);
+    }
+
+    if(stick.getRawButton(1)) {
       liftMotor.set(0.5);
     } else {
-      liftMotor.set(0.5);
+      liftMotor.set(0);
     }
-
-    if (stick.getRawButton(11)) {
-      shooterLeft.set(0.5);
-      shooterRight.set(0.5);
-    }
-
 
     double hiz = stick.getThrottle();
 
-    if (stick.getRawButton(12)) {
-      robot.arcadeDrive(hiz * stick.getY(), 1);
-    } else {
-      robot.arcadeDrive(hiz * stick.getY(), hiz * stick.getX());
-    }
+    robot.arcadeDrive(-1*hiz * stick.getY(), -1* hiz * stick.getX());
     
-
+    
     }
 
 }
