@@ -30,6 +30,7 @@ public class Robot extends TimedRobot {
   int intakeMotorId = 9;
   
   PWMTalonSRX talon = new PWMTalonSRX(0);
+
   WPI_VictorSPX leftFollower = new   WPI_VictorSPX(leftFollowerId);
   WPI_VictorSPX leftLeader = new   WPI_VictorSPX(leftLeaderId);
   WPI_VictorSPX rightLeader = new WPI_VictorSPX(rightLeaderId);
@@ -93,8 +94,8 @@ public class Robot extends TimedRobot {
       talon.set(0);
     }
 
-   
     if (stick.getRawButton(6)) { // Shooter'ın kapaklarını açan pnömatik
+
       double_elevator.set(DoubleSolenoid.Value.kForward);
     } else {
       double_elevator.set(DoubleSolenoid.Value.kOff);
@@ -107,10 +108,12 @@ public class Robot extends TimedRobot {
     }
 
     if (stick.getRawButton(5)) { //intake
+
       double_shooter.set(DoubleSolenoid.Value.kReverse);
     } else if (stick.getRawButton(7)) { 
       double_shooter.set(DoubleSolenoid.Value.kForward);
     }
+
     if (stick.getRawButton(1)) {
       shooterLeft.set(-0.8);
       shooterRight.set(0.8);
@@ -126,15 +129,11 @@ public class Robot extends TimedRobot {
       liftMotor.set(0);
     }
 
-
     double hiz = stick.getThrottle();
 
-
-  
     robot.arcadeDrive(-1*hiz * stick.getY(), -1* hiz * stick.getX());
     
     
-
     }
 
 }
