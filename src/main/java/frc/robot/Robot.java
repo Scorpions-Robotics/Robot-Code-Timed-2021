@@ -93,6 +93,8 @@ public class Robot extends TimedRobot {
   public void robotInit() {
 
     inst.startClient("roborio-7672-frc.local"); 
+    NetworkTableEntry cameraSelect1 = NetworkTableInstance.getDefault().getEntry("/PairZero");
+    cameraSelect1.setDouble(0.0);
 
     rightFollower.follow(rightLeader);
     leftFollower.follow(leftLeader);
@@ -102,8 +104,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    System.out.println(switch_value.get());
-
+ 
+  // TODO Switch motor'un geri gitmesi ile ilgili bir problem vardı, onu çözmeyi deneyelim.
+  
   if(stick.getRawButton(12)){
 
     if(switch_value.get()){
@@ -128,6 +131,11 @@ public class Robot extends TimedRobot {
   } else {
     liftMotor.set(0);
   }
+
+  if (stick.getRawButton(11)){
+    centerRobot();
+  }
+
     // Intake motor 
     if (stick.getRawButton(2)) {
       intakeMotor.set(-1);
@@ -174,8 +182,7 @@ public class Robot extends TimedRobot {
 
     }
 
-  @Override
-  public void testPeriodic() {
+  public void centerRobot() {
     try {
       //Video.get_video();
     } catch (Exception e) {
@@ -197,20 +204,24 @@ public class Robot extends TimedRobot {
     System.out.println("deneme");
     System.out.println(xEntry.getValue() + " " + yEntry + " " + hEntry + " " + wEntry);
 
+    while true {
+        if(dEntry.getDouble(0.0) < MIN_DISTANCE){
+          rightLeader.set(-0.5);
+          leftLeader.set(0.5);
+        } else if (dEntry.getDouble(0.0) > MAX_DISTANCE) {
+          rightLeader.set(0.5);
+          leftLeader.set(-0.5);
+        } else{
+          rightLeader.set(0);
+          leftLeader.set(0);
+        }
 
-    // İki merkez arası uzaklık
-    if(stick.getRawButton(11)){
-      if(dEntry.getDouble(0.0) < MIN_DISTANCE){
-        rightLeader.set(-0.5);
-        leftLeader.set(0.5);
-      } else if (dEntry.getDouble(0.0) > MAX_DISTANCE) {
-        rightLeader.set(0.5);
-        leftLeader.set(-0.5);
-      }
-      else{
-        rightLeader.set(0);
-        leftLeader.set(0);
-      }
+        if (!stick.getRawButton(11)) {
+          teleopPeriodic();
+          break;
+        }
+    }
+
   }
   }
-}
+
