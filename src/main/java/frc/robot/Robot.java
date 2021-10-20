@@ -7,6 +7,8 @@ import org.opencv.imgproc.Imgproc;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMTalonSRX;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,6 +28,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 public class Robot extends TimedRobot {
   Joystick stick = new Joystick(0);
+  XboxController controller = new XboxController(0);
 
   DigitalInput switch_value = new DigitalInput(9);
   
@@ -100,6 +103,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     System.out.println(switch_value.get());
+
   if(stick.getRawButton(12)){
 
     if(switch_value.get()){
