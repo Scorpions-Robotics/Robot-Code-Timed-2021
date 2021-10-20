@@ -34,6 +34,9 @@ public class Robot extends TimedRobot {
   NetworkTableInstance inst = NetworkTableInstance.getDefault();
  
   NetworkTable table = inst.getTable("Vision");
+
+  double MAX_DISTANCE = 5.0; 
+  double MIN_DISTANCE = 5.0;
   
   int leftFollowerId = 5;
   int leftLeaderId = 1;
@@ -59,8 +62,6 @@ public class Robot extends TimedRobot {
 
 
   DifferentialDrive robot = new DifferentialDrive(leftLeader, rightLeader);
-  JoystickButton button1 = new JoystickButton(stick, 1);
-  JoystickButton button2 = new JoystickButton(stick, 2);
   JoystickButton kElevatorS = new JoystickButton(stick, 3);
   JoystickButton kIntakeS = new JoystickButton(stick, 4);
   JoystickButton kShooterS = new JoystickButton(stick, 6);
@@ -85,6 +86,7 @@ public class Robot extends TimedRobot {
     inst.startClient("roborio-7672-frc.local"); 
     gyro.resetGyro();
     gyro.calibrate();
+
     rightFollower.follow(rightLeader);
     leftFollower.follow(leftLeader);
 
@@ -116,15 +118,16 @@ public class Robot extends TimedRobot {
     // Intake motor 
     if (stick.getRawButton(2)) {
       intakeMotor.set(-1);
-      talon.set(0.8);
-    }
-    else {
+      talon.set(1);
+    } else if(stick.getRawButton(3)){
+      intakeMotor.set(1);
+      talon.set(-1);
+    } else {
       intakeMotor.set(0);
       talon.set(0);
     }
 
     if (stick.getRawButton(6)) { // Shooter'ın kapaklarını açan pnömatik
-
       double_elevator.set(DoubleSolenoid.Value.kForward);
     } else {
       double_elevator.set(DoubleSolenoid.Value.kOff);
@@ -137,7 +140,6 @@ public class Robot extends TimedRobot {
     }
 
     if (stick.getRawButton(5)) { //intake
-
       double_shooter.set(DoubleSolenoid.Value.kReverse);
     } else if (stick.getRawButton(7)) { 
       double_shooter.set(DoubleSolenoid.Value.kForward);
@@ -146,20 +148,17 @@ public class Robot extends TimedRobot {
     if (stick.getRawButton(1)) {
       shooterLeft.set(-0.8);
       shooterRight.set(0.8);
-      liftMotor.set(0.5);
     }
     else{
       shooterLeft.set(0);
       shooterRight.set(0);
-      liftMotor.set(0);
+     
     }
-
 
     double hiz = stick.getThrottle();
 
     robot.arcadeDrive(-1*hiz * stick.getY(), -1* hiz * stick.getX());
-    
-    
+
     }
 
   @Override
@@ -179,14 +178,19 @@ public class Robot extends TimedRobot {
     System.out.println("deneme");
     System.out.println(xEntry.getValue() + " " + yEntry + " " + hEntry + " " + wEntry);
 
+
+    // İki merkez arası uzaklık
     if(stick.getRawButton(11)){
-      if((int) dEntry.getValue() < 0){
+      if(dEntry.getDouble(0.0) < MIN_DISTANCE){
+        rightLeader.set(-0.5);
+        leftLeader.set(0.5);
+      } else if (dEntry.getDouble(0.0) > MAX_DISTANCE) {
         rightLeader.set(0.5);
         leftLeader.set(-0.5);
       }
       else{
-        rightLeader.set(-0.5);
-        leftLeader.set(0.5);
+        rightLeader.set(0);
+        leftLeader.set(0);
       }
   }
   }
