@@ -106,7 +106,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
  
   // TODO Switch motor'un geri gitmesi ile ilgili bir problem vardı, onu çözmeyi deneyelim.
-  
+
   if(stick.getRawButton(12)){
 
     if(switch_value.get()){
@@ -204,7 +204,7 @@ public class Robot extends TimedRobot {
     System.out.println("deneme");
     System.out.println(xEntry.getValue() + " " + yEntry + " " + hEntry + " " + wEntry);
 
-    while true {
+    while (true) {
         if(dEntry.getDouble(0.0) < MIN_DISTANCE){
           rightLeader.set(-0.5);
           leftLeader.set(0.5);
