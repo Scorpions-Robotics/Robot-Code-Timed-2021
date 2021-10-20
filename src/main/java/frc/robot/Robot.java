@@ -3,12 +3,14 @@ package frc.robot;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMTalonSRX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
@@ -24,6 +26,8 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 public class Robot extends TimedRobot {
   Joystick stick = new Joystick(0);
+
+  DigitalInput switch_value = new DigitalInput(9);
   
   NetworkTableEntry xEntry;
   NetworkTableEntry yEntry;
@@ -48,7 +52,9 @@ public class Robot extends TimedRobot {
   int shooterRightId = 8;
   int intakeMotorId = 9;
   
+  PWMTalonSRX switchMotor = new PWMTalonSRX(2);
   PWMTalonSRX talon = new PWMTalonSRX(0);
+  
 
   WPI_VictorSPX leftFollower = new   WPI_VictorSPX(leftFollowerId);
   WPI_VictorSPX leftLeader = new   WPI_VictorSPX(leftLeaderId);
@@ -69,7 +75,6 @@ public class Robot extends TimedRobot {
 
   //Encoder enc_left = new Encoder(0, 1);
   //Encoder enc_right = new Encoder(2, 3);
-  Gyroscope gyro = new Gyroscope();
 
   DoubleSolenoid double_shooter =
       new DoubleSolenoid(2, 3);
@@ -83,38 +88,42 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+
     inst.startClient("roborio-7672-frc.local"); 
-    gyro.resetGyro();
-    gyro.calibrate();
 
     rightFollower.follow(rightLeader);
     leftFollower.follow(leftLeader);
-
-    new Thread(() -> {
-      UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-      camera.setResolution(640, 480);
-      
-
-      CvSink cvSink = CameraServer.getInstance().getVideo();
-      CvSource outputStream = CameraServer.getInstance().putVideo("Video", 640, 480);
-
-      Mat source = new Mat();
-      Mat output = new Mat();
-
-      while(!Thread.interrupted()) {
-          cvSink.grabFrame(source);
-          Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
-          outputStream.putFrame(output);
-      }
-  }).start();
 
   }
 
 
   @Override
   public void teleopPeriodic() {
-    System.out.println(gyro.getGyroAngle());
+    System.out.println(switch_value.get());
+  if(stick.getRawButton(12)){
 
+    if(switch_value.get()){
+      switchMotor.set(0.8);
+    }
+    else{
+      switchMotor.set(0);
+    }
+  }
+  else if(stick.getRawButton(8)){
+    switchMotor.set(-1);
+  }
+  else{
+    switchMotor.set(0);
+  }
+
+    
+  if (stick.getRawButton(10)){
+    liftMotor.set(0.5);
+  } else if (stick.getRawButton(9)) {
+    liftMotor.set(-0.5);
+  } else {
+    liftMotor.set(0);
+  }
     // Intake motor 
     if (stick.getRawButton(2)) {
       intakeMotor.set(-1);
@@ -163,6 +172,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
+    try {
+      //Video.get_video();
+    } catch (Exception e) {
+      
+      e.printStackTrace();
+    }
     // Pulling data from network table
     xEntry = table.getEntry("X");
     yEntry = table.getEntry("Y");

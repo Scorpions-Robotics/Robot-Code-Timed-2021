@@ -46,13 +46,13 @@ dependencies {
     implementation wpi.deps.wpilib()
     nativeZip wpi.deps.wpilibJni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.wpilibJni(wpi.platforms.desktop)
-
+    compile group: 'org.zeromq', name: 'jeromq', version: '0.5.2'
 
     implementation wpi.deps.vendor.java()
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
-
     testImplementation 'junit:junit:4.12'
+    
 
     // Enable simulation gui support. Must check the box in vscode to enable support
     // upon debugging
