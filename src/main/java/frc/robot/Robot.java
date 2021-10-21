@@ -7,6 +7,7 @@ import org.opencv.imgproc.Imgproc;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMTalonSRX;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -28,7 +29,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 public class Robot extends TimedRobot {
   Joystick stick = new Joystick(0);
-  XboxController controller = new XboxController(0);
+  XboxController controller = new XboxController(1);
 
   DigitalInput switch_value = new DigitalInput(9);
   
@@ -101,14 +102,32 @@ public class Robot extends TimedRobot {
 
   }
 
+  @Override
+  public void autonomousInit() {
+    int n = 0;
+    shooterLeft.set(-0.8);
+    shooterRight.set(0.8);
+    while(n<3){
+      Timer.delay(0.5);
+      talon.set(1);
+      Timer.delay(0.5);
+      talon.set(0);
+      n++;
+    }
+    shooterLeft.set(0);
+    shooterRight.set(0);
+    talon.set(0);
+    while(Timer.getMatchTime()<13.5){
+      robot.arcadeDrive(0.5,0);
+    }
+  }
+
 
   @Override
   public void teleopPeriodic() {
  
-  // TODO Switch motor'un geri gitmesi ile ilgili bir problem vardı, onu çözmeyi deneyelim.
 
   if(stick.getRawButton(12)){
-
     if(switch_value.get()){
       switchMotor.set(0.8);
     }
@@ -137,10 +156,10 @@ public class Robot extends TimedRobot {
   }
 
     // Intake motor 
-    if (stick.getRawButton(2)) {
+    if (controller.getBumper(Hand.kRight)) {
       intakeMotor.set(-1);
       talon.set(1);
-    } else if(stick.getRawButton(3)){
+    } else if(controller.getBumper(Hand.kLeft)) {
       intakeMotor.set(1);
       talon.set(-1);
     } else {
@@ -148,19 +167,19 @@ public class Robot extends TimedRobot {
       talon.set(0);
     }
 
-    if (stick.getRawButton(6)) { // Shooter'ın kapaklarını açan pnömatik
+    if (controller.getXButton()){ // Shooter'ın kapaklarını açan pnömatik
       double_elevator.set(DoubleSolenoid.Value.kForward);
     } else {
       double_elevator.set(DoubleSolenoid.Value.kOff);
     }
     
-    if (stick.getRawButton(4)) {
+    if (controller.getAButton()) {
       double_intake.set(DoubleSolenoid.Value.kForward);
     } else {
       double_intake.set(DoubleSolenoid.Value.kReverse);
     }
 
-    if (stick.getRawButton(5)) { //intake
+    if (controller.getBButton()) { //intake
       double_shooter.set(DoubleSolenoid.Value.kReverse);
     } else if (stick.getRawButton(7)) { 
       double_shooter.set(DoubleSolenoid.Value.kForward);
