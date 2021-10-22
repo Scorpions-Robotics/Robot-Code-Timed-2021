@@ -32,16 +32,6 @@ public class Robot extends TimedRobot {
   XboxController controller = new XboxController(1);
 
   DigitalInput switch_value = new DigitalInput(9);
-  
-  NetworkTableEntry xEntry;
-  NetworkTableEntry yEntry;
-  NetworkTableEntry hEntry;
-  NetworkTableEntry wEntry;
-  NetworkTableEntry dEntry;
-
-  NetworkTableInstance inst = NetworkTableInstance.getDefault();
- 
-  NetworkTable table = inst.getTable("Vision");
 
   double MAX_DISTANCE = 5.0; 
   double MIN_DISTANCE = 5.0;
@@ -72,13 +62,6 @@ public class Robot extends TimedRobot {
 
 
   DifferentialDrive robot = new DifferentialDrive(leftLeader, rightLeader);
-  JoystickButton kElevatorS = new JoystickButton(stick, 3);
-  JoystickButton kIntakeS = new JoystickButton(stick, 4);
-  JoystickButton kShooterS = new JoystickButton(stick, 6);
-  JoystickButton kPIDActivate = new JoystickButton(stick, 11);
-
-  //Encoder enc_left = new Encoder(0, 1);
-  //Encoder enc_right = new Encoder(2, 3);
 
   DoubleSolenoid double_shooter =
       new DoubleSolenoid(2, 3);
@@ -90,44 +73,43 @@ public class Robot extends TimedRobot {
       new DoubleSolenoid(4, 5);
 
 
+  
   @Override
   public void robotInit() {
-
-    inst.startClient("roborio-7672-frc.local"); 
-    NetworkTableEntry cameraSelect1 = NetworkTableInstance.getDefault().getEntry("/PairZero");
-    cameraSelect1.setDouble(0.0);
 
     rightFollower.follow(rightLeader);
     leftFollower.follow(leftLeader);
 
+    CameraServer.getInstance().startAutomaticCapture();
   }
 
+  /*
   @Override
   public void autonomousInit() {
     int n = 0;
     shooterLeft.set(-0.8);
     shooterRight.set(0.8);
     while(n<3){
-      Timer.delay(0.5);
+      Timer.delay(1.0);
       talon.set(1);
-      Timer.delay(0.5);
+      Timer.delay(1.0);
       talon.set(0);
       n++;
     }
     shooterLeft.set(0);
     shooterRight.set(0);
     talon.set(0);
-    while(Timer.getMatchTime()<13.5){
+    while(Timer.getMatchTime()<13.5 && isAutonomous()){
       robot.arcadeDrive(0.5,0);
     }
   }
-
+ */
 
   @Override
   public void teleopPeriodic() {
  
-
-  if(stick.getRawButton(12)){
+  // BUNU CONTROLLER'A AL
+  if(stick.getRawButton(7)){ //askıyı yukarı al
     if(switch_value.get()){
       switchMotor.set(0.8);
     }
@@ -142,24 +124,19 @@ public class Robot extends TimedRobot {
     switchMotor.set(0);
   }
 
-    
-  if (stick.getRawButton(10)){
+  if (stick.getRawButton(9)){ 
     liftMotor.set(0.5);
-  } else if (stick.getRawButton(9)) {
+  } else if (stick.getRawButton(10)) {
     liftMotor.set(-0.5);
   } else {
     liftMotor.set(0);
   }
 
-  if (stick.getRawButton(11)){
-    centerRobot();
-  }
-
     // Intake motor 
-    if (controller.getBumper(Hand.kRight)) {
+    if (stick.getRawButton(2)) {
       intakeMotor.set(-1);
       talon.set(1);
-    } else if(controller.getBumper(Hand.kLeft)) {
+    } else if(stick.getRawButton(3)) {
       intakeMotor.set(1);
       talon.set(-1);
     } else {
@@ -167,21 +144,21 @@ public class Robot extends TimedRobot {
       talon.set(0);
     }
 
-    if (controller.getXButton()){ // Shooter'ın kapaklarını açan pnömatik
+    if (stick.getRawButton(5)){ // Shooter'ın kapaklarını açan pnömatik
       double_elevator.set(DoubleSolenoid.Value.kForward);
     } else {
       double_elevator.set(DoubleSolenoid.Value.kOff);
     }
     
-    if (controller.getAButton()) {
+    if (stick.getRawButton(6)) { 
       double_intake.set(DoubleSolenoid.Value.kForward);
     } else {
       double_intake.set(DoubleSolenoid.Value.kReverse);
     }
 
-    if (controller.getBButton()) { //intake
+    if (stick.getRawButton(11)) { //intake
       double_shooter.set(DoubleSolenoid.Value.kReverse);
-    } else if (stick.getRawButton(7)) { 
+    } else if (stick.getRawButton(12)) {  //intake kapatma tuşu
       double_shooter.set(DoubleSolenoid.Value.kForward);
     }
 
@@ -200,7 +177,7 @@ public class Robot extends TimedRobot {
     robot.arcadeDrive(-1*hiz * stick.getY(), -1* hiz * stick.getX());
 
     }
-
+ /*
   public void centerRobot() {
     try {
       //Video.get_video();
@@ -241,6 +218,6 @@ public class Robot extends TimedRobot {
         }
     }
 
-  }
+  } */
   }
 
