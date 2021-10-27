@@ -15,10 +15,6 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
@@ -31,6 +27,11 @@ public class Robot extends TimedRobot {
   Joystick stick = new Joystick(0);
   XboxController controller = new XboxController(1);
 
+
+ 
+ 
+ // UsbCamera usb = new UsbCamera("USB Camera 0", 1);
+  
   DigitalInput switch_value = new DigitalInput(9);
 
   double MAX_DISTANCE = 5.0; 
@@ -76,34 +77,89 @@ public class Robot extends TimedRobot {
   
   @Override
   public void robotInit() {
+  //  CameraServer.getInstance().startAutomaticCapture();
+    UsbCamera usb =  CameraServer.getInstance().startAutomaticCapture(0);
+    usb.setResolution(480, 360);
+    CameraServer.getInstance().getVideo(usb);
 
+    
     rightFollower.follow(rightLeader);
     leftFollower.follow(leftLeader);
 
-    CameraServer.getInstance().startAutomaticCapture();
+  /*  rightLeader.setSafetyEnabled(true);
+    leftLeader.setSafetyEnabled(true);
+
+    rightFollower.setSafetyEnabled(true);
+    leftFollower.setSafetyEnabled(true);
+    */
   }
 
-  /*
+  
   @Override
   public void autonomousInit() {
     int n = 0;
-    shooterLeft.set(-0.8);
-    shooterRight.set(0.8);
-    while(n<3){
-      Timer.delay(1.0);
-      talon.set(1);
-      Timer.delay(1.0);
+    shooterLeft.set(-0.70);
+    shooterRight.set(0.70);
+    
+    while(n<2){
+      Timer.delay(1.50);
+      talon.set(0.9);
+      Timer.delay(1.50);
       talon.set(0);
       n++;
     }
     shooterLeft.set(0);
     shooterRight.set(0);
     talon.set(0);
-    while(Timer.getMatchTime()<13.5 && isAutonomous()){
-      robot.arcadeDrive(0.5,0);
+    while(isAutonomous()){
+      robot.arcadeDrive(-0.40, 0.20);
     }
+    /*rightLeader.set(0.45);
+    leftLeader.set(-0.45);
+
+    Timer.delay(5.0);
+    rightLeader.set(0.0);
+    leftLeader.set(0.0);*/
+
+
+    
   }
- */
+
+  //
+  @Override
+  public void autonomousPeriodic() {
+/*
+    shooterLeft.set(-0.83);
+    shooterRight.set(0.83);
+
+    double currentTime = Timer.getFPGATimestamp();
+    while(currentTime < 1.5) {
+      talon.set(0.9);
+      currentTime += Timer.getFPGATimestamp();
+    } 
+
+    currentTime = 0.0;
+    while(currentTime < 1.5) {
+      talon.set(0.0);
+      currentTime += Timer.getFPGATimestamp();
+    } 
+
+    shooterLeft.set(0);
+    shooterRight.set(0);
+    talon.set(0);
+    
+    currentTime = 0.0;
+    while(currentTime < 1.5){
+      rightLeader.set(0.45);
+      leftLeader.set(-0.45);
+      currentTime += Timer.getFPGATimestamp();
+    }
+    
+    rightLeader.set(0.0);
+    leftLeader.set(0.0);
+*/
+  }
+ 
 
   @Override
   public void teleopPeriodic() {
@@ -111,7 +167,7 @@ public class Robot extends TimedRobot {
   // BUNU CONTROLLER'A AL
   if(stick.getRawButton(7)){ //askıyı yukarı al
     if(switch_value.get()){
-      switchMotor.set(0.8);
+      switchMotor.set(1);
     }
     else{
       switchMotor.set(0);
@@ -163,8 +219,8 @@ public class Robot extends TimedRobot {
     }
 
     if (stick.getRawButton(1)) {
-      shooterLeft.set(-0.8);
-      shooterRight.set(0.8);
+      shooterLeft.set(-0.83);
+      shooterRight.set(0.83);
     }
     else{
       shooterLeft.set(0);
