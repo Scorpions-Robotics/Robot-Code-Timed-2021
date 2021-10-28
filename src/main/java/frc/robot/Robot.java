@@ -97,11 +97,9 @@ public class Robot extends TimedRobot {
   
   @Override
   public void autonomousInit() {
-    int n = 0;
     shooterLeft.set(-0.70);
     shooterRight.set(0.70);
-    
-    while(n<2){
+    for(int n = 0; n<2; n++){
       Timer.delay(1.50);
       talon.set(0.9);
       Timer.delay(1.50);
