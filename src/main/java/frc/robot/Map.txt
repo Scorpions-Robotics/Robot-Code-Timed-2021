@@ -1,0 +1,12 @@
+  Joystick...
+  1: Shooter tekerleklerini döndürür
+  2: Intake ve kayış motorları ileri
+  3: Intake ve kayış motorları geri,
+  5: Shooter'ın kapağını açan pnömatik
+  6: Namluyu kaldıran pnömatik
+  7: Kanca motoru yukarı
+  8: Kanca motoru aşağı
+  9: Lift motor ileri
+  10: Lift motor geri
+  11: Intake açma
+  12: Intake kapatma
