@@ -15,19 +15,22 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
+import com.analog.adis16470.frc.ADIS16470_IMU;
 //import com.analog.adis16470.frc.ADIS16470_IMU;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 public class Robot extends TimedRobot {
   Joystick stick = new Joystick(0);
   XboxController controller = new XboxController(1);
-
-
  
  
  // UsbCamera usb = new UsbCamera("USB Camera 0", 1);
@@ -46,6 +49,19 @@ public class Robot extends TimedRobot {
   int shooterLeftId = 7;
   int shooterRightId = 8;
   int intakeMotorId = 9;
+
+  frc.robot.Gyro gyro = new frc.robot.Gyro();
+
+  NetworkTableEntry xEntry;
+  NetworkTableEntry yEntry;
+  NetworkTableEntry hEntry;
+  NetworkTableEntry wEntry;
+  NetworkTableEntry dEntry;
+  NetworkTableEntry bEntry;
+  NetworkTableEntry rEntry;
+
+  NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  NetworkTable table = inst.getTable("vision");
   
   PWMTalonSRX switchMotor = new PWMTalonSRX(2);
   PWMTalonSRX talon = new PWMTalonSRX(0);
@@ -86,9 +102,10 @@ public class Robot extends TimedRobot {
     rightFollower.follow(rightLeader);
     leftFollower.follow(leftLeader);
 
+    inst.startClient("roborio-7672-frc.local");
+
   /*  rightLeader.setSafetyEnabled(true);
     leftLeader.setSafetyEnabled(true);
-
     rightFollower.setSafetyEnabled(true);
     leftFollower.setSafetyEnabled(true);
     */
@@ -112,15 +129,6 @@ public class Robot extends TimedRobot {
     while(isAutonomous()){
       robot.arcadeDrive(-0.40, 0.20);
     }
-    /*rightLeader.set(0.45);
-    leftLeader.set(-0.45);
-
-    Timer.delay(5.0);
-    rightLeader.set(0.0);
-    leftLeader.set(0.0);*/
-
-
-    
   }
 
   //
@@ -129,19 +137,16 @@ public class Robot extends TimedRobot {
 /*
     shooterLeft.set(-0.83);
     shooterRight.set(0.83);
-
     double currentTime = Timer.getFPGATimestamp();
     while(currentTime < 1.5) {
       talon.set(0.9);
       currentTime += Timer.getFPGATimestamp();
     } 
-
     currentTime = 0.0;
     while(currentTime < 1.5) {
       talon.set(0.0);
       currentTime += Timer.getFPGATimestamp();
     } 
-
     shooterLeft.set(0);
     shooterRight.set(0);
     talon.set(0);
@@ -157,11 +162,16 @@ public class Robot extends TimedRobot {
     leftLeader.set(0.0);
 */
   }
- 
+
+  @Override
+  public void teleopInit() {
+    gyro.resetGyro();
+    gyro.calibrate();
+  }
 
   @Override
   public void teleopPeriodic() {
- 
+    SmartDashboard.putNumber("Aci", gyro.getGyroAngle());
   // BUNU CONTROLLER'A AL
   if(stick.getRawButton(7)){ //askıyı yukarı al
     if(switch_value.get()){
@@ -228,7 +238,7 @@ public class Robot extends TimedRobot {
 
     double hiz = stick.getThrottle();
 
-    robot.arcadeDrive(-1*hiz * stick.getY(), -1* hiz * stick.getX());
+    robot.arcadeDrive(hiz * stick.getY(), hiz * stick.getX());
 
     }
  /*
@@ -245,15 +255,6 @@ public class Robot extends TimedRobot {
     hEntry = table.getEntry("H");
     wEntry = table.getEntry("W");
     dEntry = table.getEntry("D");
-
-
-    // When y value is changed
-    yEntry.addListener(event -> {
-      System.out.println("Y changed value: " + yEntry.getValue());
-   }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-    System.out.println("deneme");
-    System.out.println(xEntry.getValue() + " " + yEntry + " " + hEntry + " " + wEntry);
-
     while (true) {
         if(dEntry.getDouble(0.0) < MIN_DISTANCE){
           rightLeader.set(-0.5);
@@ -265,13 +266,48 @@ public class Robot extends TimedRobot {
           rightLeader.set(0);
           leftLeader.set(0);
         }
-
         if (!stick.getRawButton(11)) {
           teleopPeriodic();
           break;
         }
     }
-
   } */
-  }
 
+
+  @Override
+  public void testPeriodic() {
+    // xEntry = table.getEntry("X");
+    // yEntry = table.getEntry("Y");
+    // hEntry = table.getEntry("H");
+    // wEntry = table.getEntry("W");
+    // dEntry = table.getEntry("D");
+    // bEntry = table.getEntry("B");
+    // rEntry = table.getEntry("R");
+
+    
+
+    // SmartDashboard.putNumber("value", controller.getTriggerAxis(GenericHID.Hand.kRight));
+
+
+    // SmartDashboard.putNumber("B", bEntry.getDouble(0.0));
+
+
+    // if(bEntry.getDouble(0.0)==0){
+    //   SmartDashboard.putString("X_String", "None");
+    //   SmartDashboard.putString("Y_String", "None");
+    //   SmartDashboard.putString("H_String", "None");
+    //   SmartDashboard.putString("W_String", "None");
+    //   SmartDashboard.putString("D_String", "None");
+    //   SmartDashboard.putString("R_String", "None");
+    // }
+    // else{
+    //   SmartDashboard.putNumber("X", Integer.valueOf(xEntry.getString("")));
+    //   SmartDashboard.putNumber("Y", Integer.valueOf(yEntry.getString("")));
+    //   SmartDashboard.putNumber("H", Integer.valueOf(hEntry.getString("")));
+    //   SmartDashboard.putNumber("W", Integer.valueOf(wEntry.getString("")));
+    //   SmartDashboard.putNumber("D", Integer.valueOf(dEntry.getString("")));
+    //   SmartDashboard.putNumber("R", Integer.valueOf(rEntry.getString("")));
+    // }
+    
+  }
+  }
