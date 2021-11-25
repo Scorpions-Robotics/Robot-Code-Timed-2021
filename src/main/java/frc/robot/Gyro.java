@@ -32,7 +32,7 @@ public class Gyro {
         this.startTime = Timer.getFPGATimestamp();   
         double startAngle = imu.getAngle();
         try{
-            Thread.sleep(1000);
+            Thread.sleep(15000);
         } catch(Exception e) {
         }
         this.driftPerSecond = (imu.getAngle() - startAngle)/(Timer.getFPGATimestamp() - startTime);

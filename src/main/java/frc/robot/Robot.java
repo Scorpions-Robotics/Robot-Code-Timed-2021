@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
   int shooterRightId = 8;
   int intakeMotorId = 9;
 
-  frc.robot.Gyro gyro = new frc.robot.Gyro();
+  // frc.robot.Gyro gyro = new frc.robot.Gyro();
 
   NetworkTableEntry xEntry;
   NetworkTableEntry yEntry;
@@ -165,13 +165,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    gyro.resetGyro();
-    gyro.calibrate();
+    // gyro.resetGyro();
+    // gyro.calibrate();
   }
 
   @Override
   public void teleopPeriodic() {
-    SmartDashboard.putNumber("Aci", gyro.getGyroAngle());
+    // SmartDashboard.putNumber("Aci", gyro.getGyroAngle());
   // BUNU CONTROLLER'A AL
   if(stick.getRawButton(7)){ //askıyı yukarı al
     if(switch_value.get()){
@@ -276,38 +276,38 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    // xEntry = table.getEntry("X");
-    // yEntry = table.getEntry("Y");
-    // hEntry = table.getEntry("H");
-    // wEntry = table.getEntry("W");
-    // dEntry = table.getEntry("D");
-    // bEntry = table.getEntry("B");
-    // rEntry = table.getEntry("R");
+    xEntry = table.getEntry("X");
+    yEntry = table.getEntry("Y");
+    hEntry = table.getEntry("H");
+    wEntry = table.getEntry("W");
+    dEntry = table.getEntry("D");
+    bEntry = table.getEntry("B");
+    rEntry = table.getEntry("R");
 
     
 
-    // SmartDashboard.putNumber("value", controller.getTriggerAxis(GenericHID.Hand.kRight));
+    SmartDashboard.putNumber("value", controller.getTriggerAxis(GenericHID.Hand.kRight));
 
 
-    // SmartDashboard.putNumber("B", bEntry.getDouble(0.0));
+    SmartDashboard.putNumber("B", bEntry.getDouble(0.0));
 
 
-    // if(bEntry.getDouble(0.0)==0){
-    //   SmartDashboard.putString("X_String", "None");
-    //   SmartDashboard.putString("Y_String", "None");
-    //   SmartDashboard.putString("H_String", "None");
-    //   SmartDashboard.putString("W_String", "None");
-    //   SmartDashboard.putString("D_String", "None");
-    //   SmartDashboard.putString("R_String", "None");
-    // }
-    // else{
-    //   SmartDashboard.putNumber("X", Integer.valueOf(xEntry.getString("")));
-    //   SmartDashboard.putNumber("Y", Integer.valueOf(yEntry.getString("")));
-    //   SmartDashboard.putNumber("H", Integer.valueOf(hEntry.getString("")));
-    //   SmartDashboard.putNumber("W", Integer.valueOf(wEntry.getString("")));
-    //   SmartDashboard.putNumber("D", Integer.valueOf(dEntry.getString("")));
-    //   SmartDashboard.putNumber("R", Integer.valueOf(rEntry.getString("")));
-    // }
+    if(bEntry.getDouble(0.0)==0){
+      SmartDashboard.putString("X_String", "None");
+      SmartDashboard.putString("Y_String", "None");
+      SmartDashboard.putString("H_String", "None");
+      SmartDashboard.putString("W_String", "None");
+      SmartDashboard.putString("D_String", "None");
+      SmartDashboard.putString("R_String", "None");
+    }
+    else{
+      SmartDashboard.putNumber("X", Integer.valueOf(xEntry.getString("")));
+      SmartDashboard.putNumber("Y", Integer.valueOf(yEntry.getString("")));
+      SmartDashboard.putNumber("H", Integer.valueOf(hEntry.getString("")));
+      SmartDashboard.putNumber("W", Integer.valueOf(wEntry.getString("")));
+      SmartDashboard.putNumber("D", Integer.valueOf(dEntry.getString("")));
+      SmartDashboard.putNumber("R", Integer.valueOf(rEntry.getString("")));
+    }
     
   }
   }
